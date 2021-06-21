@@ -1,0 +1,21 @@
+{{- range $node := .Values.indy.nodes }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $node.alias }}
+  labels:
+    {{- include "indy.labels" $ | nindent 4 }}
+    node: {{ $node.alias }}
+spec:
+  ports:
+  - name: node
+    targetPort: node
+    port: 9701
+  - name: client
+    targetPort: client
+    port: 9702
+  clusterIP: None
+  selector:
+    node: {{ $node.alias }}
+{{- end }}

@@ -1,0 +1,106 @@
+
+{{- range $node := .Values.indy.nodes }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "indy.fullname" $ }}-{{ $node.alias }}
+  labels:
+    {{- include "indy.labels" $ | nindent 4 }}
+    node: {{ $node.alias }}
+spec:
+  {{- if not $.Values.autoscaling.enabled }}
+  replicas: {{ $.Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "indy.selectorLabels" $ | nindent 6 }}
+      node: {{ $node.alias }}
+  template:
+    metadata:
+      {{- with $.Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "indy.selectorLabels" $ | nindent 8 }}
+        node: {{ $node.alias }}
+    spec:
+      hostname: {{ $node.alias }}
+      # hostNetwork: true
+      initContainers:
+        - name: init-myservice
+          image: busybox:1.28
+          command: ['sh', '-c', "cp /etc/indy-base/indy_config.py /etc/indy/indy_config.py"]
+          volumeMounts:
+            - name: config
+              mountPath: /etc/indy/
+            - name: config-base
+              mountPath: /etc/indy-base/indy_config.py
+              subPath: indy_config.py
+      containers:
+        - name: {{ $.Chart.Name }}
+          securityContext:
+            {{- toYaml $.Values.securityContext | nindent 12 }}
+          image: "{{ $.Values.image.repository }}:{{ $.Values.image.tag | default $.Chart.AppVersion }}"
+          imagePullPolicy: {{ $.Values.image.pullPolicy }}
+          ports:
+            - name: client
+              containerPort: {{ $node.client_port }}
+              protocol: TCP
+            - name: node
+              containerPort: {{ $node.node_port }}
+              protocol: TCP
+          env:
+            - name: INDY_NETWORK_NAME
+              value: {{ $.Values.indy.network_name}}
+            - name: "INDY_NODE_NAME"
+              value: {{ $node.alias }}
+            - name: INDY_NODE_SEED
+              valueFrom:
+                secretKeyRef:
+                  name: indy-seed-{{ $node.alias }}
+                  key: seed
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/indy
+            - name: transactions
+              mountPath: /var/lib/indy/{{ $.Values.indy.network_name }}/domain_transactions_genesis
+              subPath: domain_transactions_genesis
+            - name: transactions
+              mountPath: /var/lib/indy/{{ $.Values.indy.network_name }}/pool_transactions_genesis
+              subPath: pool_transactions_genesis
+            - name: config
+              mountPath: /etc/indy/
+            #   subPath: indy_config.py
+          resources:
+            {{- toYaml $.Values.resources | nindent 12 }}
+      volumes:
+        - name: transactions
+          configMap:
+            name: indy-node-cm
+        - name: config-base
+          configMap:
+            name: indy-config
+        - name: config
+          # hostPath:
+          #  path: /var/lib/indy
+          emptyDir: {}
+        - name: data
+          # hostPath:
+          #  path: /var/lib/indy
+          emptyDir: {}
+      {{- with $.Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $.Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $.Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
+{{- end }}

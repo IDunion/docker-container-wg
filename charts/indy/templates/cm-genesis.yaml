@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: indy-node-cm
+  labels:
+    {{- include "indy.labels" . | nindent 4 }}
+data:
+  domain_transactions_genesis: |-
+  {{- range $domain := .Values.indy.domain_transactions }}
+    {"dest":"{{ $domain.dest }}","role":"{{ $domain.role }}","type":"1","identifier":"{{ $domain.identifier }}", "verkey":"{{ $domain.verkey }}"}
+  {{- end }}
+  pool_transactions_genesis: |-
+  {{- range $index, $node := .Values.indy.pool_transactions }}
+    {"data":{"alias":"{{ $node.alias }}","blskey":"{{ $node.blskey }}","client_ip":"{{ $node.client_ip }}","client_port":{{ $node.client_port }},"node_ip":"{{ $node.node_ip }}","node_port":{{ $node.node_port }},"services":["VALIDATOR"]},"dest":"{{ $node.dest }}","identifier":"{{ $node.identifier }}","txnId":"{{ $node.txnId }}","type":"0"}
+  {{- end }}

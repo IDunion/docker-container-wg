@@ -1,0 +1,208 @@
+# Default values for indy.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: ghcr.io/idunion/indy-node-container/indy_node
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+
+indy:
+  # Default values for indy.
+  # This is a YAML-formatted file.
+  # Declare variables to be passed into your templates.
+
+  network_name: sandbox
+
+  # DOMAIN:
+  # dest: the DID of the entity (generated with indy client)
+  # role: 0 for TRUSTEE, 2 for STEWARD, no role for CLIENT (there's more, have to look at SDK)
+  # verkey: is the truncated verification key (generated with indy client)
+  # identifier: (no idea yet, seems to point to the trustee, could be the trustee that added it?)
+
+  domain_transactions:
+    - identity: trustee1
+      role: "0"
+      dest: "4QxzWk3ajdnEA37NdNU5Kt"
+      verkey: "~8RBNqGxt6TsUL4uHQmpy4r"
+      identifier: 
+    - identity: steward1
+      role: "2"
+      dest: "4cLztgZYocjqTdAZM93t27"
+      verkey: "~G735ywSBri4x3svvVE8qYY"
+      identifier: "4QxzWk3ajdnEA37NdNU5Kt"
+    - identity: steward2
+      role: "2"
+      dest: "JDmZmbYJnRyz5mb5U9wCxK"
+      verkey: "~4Z7Qnboe25QhrDsy1MqUUu"
+      identifier: "4QxzWk3ajdnEA37NdNU5Kt"
+    - identity: steward3
+      role: "2"
+      dest: "NhSTz5qnEnUtR4eD3pef4N"
+      verkey: "~FByWuddNxRVcSaHqDMmjor"
+      identifier: "4QxzWk3ajdnEA37NdNU5Kt"
+  #  - identity: steward4
+  #    role: "2"
+  #    dest: "XvfMzdPbDtUoVuMAKGH7n8"
+  #    verkey: "~XPHMTchMuFnxdtU1GgyDEY"
+  #    identifier: "4QxzWk3ajdnEA37NdNU5Kt"
+
+  # POOL:
+  # alias: an alias for the node, eg. steward1
+  # blskey: generated using init_indy_node
+  # client_ip: ip where clients communicate, eg. 10.0.1.11
+  # client_port: port whre clients communicate, eg. 9702
+  # node_ip: ip for inter-node communication, eg. 10.0.1.11
+  # node_port: port for inter-node communication, eg. 9701
+  # dest: base58 encoded node verification key
+  # identifier: the DID of the steward (from domain_transactions)
+  # txnId: a series of hex characters (64 characters, must be unique)
+  pool_transactions:
+    - alias: steward1
+      client_ip: "steward1"
+      client_port: "9702"
+      node_ip: "steward1"
+      node_port: "9701"
+      blskey: "gVE5JwrJzfCB7JhzDKehyjv771N24Ce8sFffJdN82KjtDfCzLngPG7DQGhncFnLe9TWDqGmUkGQv24LhMicFTBWR69kxmLFohzeNLvXfKEAZZwYXFMoTEU2SR7Pq19ezU3QDBccHP4x7TyKZTKg4YKs4wsVvMsLKzpo3qJzjKyNvdb"
+      dest: "2y6oVqbnTeZ4tv6WUY7FMHhY6SouNixyeWKHPgFDCsY8"
+      identifier: "4cLztgZYocjqTdAZM93t27"
+      txnId: "fea82e10e894419fe2bea7d96296a6d46f50f93f9eeda954ec461b2ed2950b62"
+    - alias: steward2
+      client_ip: "steward2"
+      client_port: "9702"
+      node_ip: "steward2"
+      node_port: "9701"
+      blskey: "2X7jXgMSDwfHAn1Sirz32RTiiEVMAoqF7pJksAHnJeRgDaWG3ra6NXH5Fxgjm9Nqs195PAyEDhLRxUd7Up9YuTwqNzsax49M7pXVnNpmE4grX42xdnCHXmSiEd9hXtC66AS8FxbHzVRrhei22o3jrT3DF63GtXedxMV3cL9nfKAQwSD"
+      dest: "APN393PJb55Jyi94DtgkQPd9zxghPbFSPqheppei5Esf"
+      identifier: "JDmZmbYJnRyz5mb5U9wCxK"
+      txnId: "1ac8aece2a18ced660fef8694b61aac3af08ba875ce3026a160acbc3a3af35fc"
+    - alias: steward3
+      client_ip: "steward3"
+      client_port: "9702"
+      node_ip: "steward3"
+      node_port: "9701"
+      blskey: "2LDCy2sXtvYDwPEeE2Swwo4nGRV3KaaD3imEpSHmuG8ZWYvRwzaj2T9VVLc2ezj5RStaQiCtbMowWscsrQR5YPZ3ZK1VvLp43EvepRDGzR8ingcgMx4vFEWVWmRSJxm64Ee6Py8c7FT5zTjAAiCu5NFxQznUSG93HgbLjiQ8NTubbC9"
+      dest: "CptjtSLBcJyLuHN8SQYfCg9VnYRqVPnHYr4vaNg9yspQ"
+      identifier: "NhSTz5qnEnUtR4eD3pef4N"
+      txnId: "7e9f355dffa78ed24668f0e0e369fd8c224076571c51e2ea8be5f26479edebe4"
+  #  - alias: steward4
+  #    client_ip: "steward4"
+  #    client_port: "9702"
+  #    node_ip: "steward4"
+  #    node_port: "9701"
+  #    blskey: "eLSXyKqw7neULSsiSYWg9M5UnKBj6dsF5pP5FTKFABYkXxbzoiWUoTNxZSdWEYgAGCERewMNWi1Fhd6mdxw6Q42RiZFdJ5vBs4Kz1XUed6vymGGYJjHQwv8nKTwG95yfr5FQm2YcTHoBZHGrunGAa6xybQ5nsdrxovX7mMwecxGqmr"
+  #    dest: "HrcB3sXM3zaVSG4druxdtmBCSq5p5C6XPer9BZYSgqY4"
+  #    identifier: "XvfMzdPbDtUoVuMAKGH7n8"
+  #    txnId: "aa5e817d7cc626170eca175822029339a444eb0ee8f0bd20d3b0b76e566fb008"
+
+
+  # POOL:
+  # alias: an alias for the node, eg. steward1
+  # blskey: generated using init_indy_node
+  # client_ip: ip where clients communicate, eg. 10.0.1.11
+  # client_port: port whre clients communicate, eg. 9702
+  # node_ip: ip for inter-node communication, eg. 10.0.1.11
+  # node_port: port for inter-node communication, eg. 9701
+  # dest: base58 encoded node verification key
+  # identifier: the DID of the steward (from domain_transactions)
+  # txnId: a series of hex characters (64 characters, must be unique)
+  nodes:
+    - alias: steward1
+      seed: "00000000000000000000000000000001"
+      client_ip: "steward1"
+      client_port: "9702"
+      node_ip: "steward1"
+      node_port: "9701"
+    - alias: steward2
+      seed: "00000000000000000000000000000002"
+      client_ip: "steward2"
+      client_port: "9702"
+      node_ip: "steward2"
+      node_port: "9701"
+    - alias: steward3
+      seed: "00000000000000000000000000000003"
+      client_ip: "steward3"
+      client_port: "9702"
+      node_ip: "steward3"
+      node_port: "9701"
+  #  - alias: steward4
+  #    seed: "00000000000000000000000000000004"
+  #    client_ip: "steward4"
+  #    client_port: "9702"
+  #    node_ip: "steward4"
+  #    node_port: "9701"
