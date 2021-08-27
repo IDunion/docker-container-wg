@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   indy-node_1:
-    image: ghcr.io/idunion/indy-node-container/indy_node:buster
+    image: ${IMAGE}
     container_name: node1
     ports:
       - "${INDY_NODE_PORT_1}:${INDY_NODE_PORT_1}"
@@ -24,7 +24,7 @@ services:
         ipv4_address: 10.133.133.1
 
   indy-node_2:
-    image: ghcr.io/idunion/indy-node-container/indy_node:buster
+    image: ${IMAGE}
     container_name: node2
     ports:
       - "${INDY_NODE_PORT_2}:${INDY_NODE_PORT_2}"
@@ -46,7 +46,7 @@ services:
         ipv4_address: 10.133.133.2
 
   indy-node_3:
-    image: ghcr.io/idunion/indy-node-container/indy_node:buster
+    image: ${IMAGE}
     container_name: node3
     ports:
       - "${INDY_NODE_PORT_3}:${INDY_NODE_PORT_3}"
@@ -68,7 +68,7 @@ services:
         ipv4_address: 10.133.133.3
 
   indy-node_4:
-    image: ghcr.io/idunion/indy-node-container/indy_node:buster
+    image: ${IMAGE}
     container_name: node4
     ports:
       - "${INDY_NODE_PORT_4}:${INDY_NODE_PORT_4}"

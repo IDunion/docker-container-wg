@@ -11,6 +11,7 @@ services:
     volumes:
       - ./etc_indy:/etc/indy
       - ./lib_indy:/var/lib/indy
+      - ./log_indy:/var/log/indy
     env_file:
       - .env
       - .node.env
